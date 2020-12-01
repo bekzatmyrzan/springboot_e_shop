@@ -1,0 +1,113 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form>
+            <h2 th:text="#{menu.allItems}" style="float: left"></h2>
+            <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
+                    data-target="#addItemModal">ADD NEW
+            </button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Price</th>
+                <th scope="col">Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item:${items}">
+                <th scope="row" th:text="${item.getId()}"></th>
+                <td th:text="${item.getName()}"></td>
+                <td th:text="${item.getBrand().getName()}"></td>
+                <td th:text="${item.getPrice()}"></td>
+                <td><a th:href="@{'/admin_item_details/' + ${item.getId()}}">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-question-circle" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                    </svg>
+                </a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog"
+             aria-labelledby="addItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" th:action="@{'/addItem'}" id="add_form">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addItemModalLabel"
+                                th:text="#{label.add} + #{label.new} + #{label.item}"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="item_name">Item Name:</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name"
+                                       placeholder="Name...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item_description">Item Description:</label>
+                                <textarea type="text" class="form-control" id="item_description"
+                                          name="item_description" placeholder="Description..."> </textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="item_price">Item Price:</label>
+                                <input type="number" class="form-control" id="item_price"
+                                       name="item_price" placeholder="Price...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item_stars">Item Stars:</label>
+                                <input type="number" class="form-control" id="item_stars"
+                                       name="item_stars" placeholder="Stars...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item_smallPicURL">item smallPicURL:</label>
+                                <input type="text" class="form-control" id="item_smallPicURL" name="item_smallPicURL"
+                                       placeholder="smallPicURL...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item_largePicURL">item largePicURL:</label>
+                                <input type="text" class="form-control" id="item_largePicURL" name="item_largePicURL"
+                                       placeholder="largePicURL...">
+                            </div>
+                            <div class="form-group">
+                                <label for="item_largePicURL">item Brand:</label>
+                                <select class="form-control" name="item_brand_id">
+                                    <option th:each="brand:${brands}" th:text="${brand.getName()}"
+                                            th:value="${brand.getId()}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Show in Top page:</label>
+                                <select class="form-control" name="item_inTopPage">
+                                    <option value="no">NO</option>
+                                    <option value="yes">YES</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark">Add Item</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+
+</html>

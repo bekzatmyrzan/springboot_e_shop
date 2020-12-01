@@ -1,0 +1,4 @@
+com\example\AllEShop\DB\DBManager.class
+com\example\AllEShop\AllEShopApplication.class
+com\example\AllEShop\DB\ShopItem.class
+com\example\AllEShop\Controllers\HomeController.class

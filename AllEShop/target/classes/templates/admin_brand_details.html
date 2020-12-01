@@ -1,0 +1,40 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form method="POST" th:action="@{'/editBrand'}" id="edit_form">
+            <h2 th:text="${brand.getName()}"></h2>
+            <div class="form-group">
+                <label for="brand_name">Brand Name:</label>
+                <input type="hidden" name="brand_id" th:value="${brand.getId()}">
+                <input type="text" class="form-control" id="brand_name" name="brand_name"
+                       placeholder="Name..." th:value="${brand.getName()}">
+            </div>
+            <div class="form-group">
+                <label for="brand_url">Picture URL:</label>
+                <input type="text" class="form-control" id="brand_url"
+                       name="brand_url" placeholder="Price..." th:value="${brand.getPicture_url()}">
+            </div>
+            <div class="form-group">
+                <label>Brand country:</label>
+                <select class="form-control" name="brand_country_id">
+                    <option th:each="country:${countries}" th:text="${country.getName()}"
+                            th:value="${country.getId()}"
+                            th:selected="${brand.getCountry()==country}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save Brand</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteBrand'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${brand.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteBrand}"
+                        style="float: right"></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</html>

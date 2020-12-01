@@ -1,0 +1,49 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form method="POST" th:action="@{'/editUser'}" id="edit_form">
+            <h2 th:text="${user.getFull_name()}"></h2>
+            <div class="form-group">
+                <label for="email">User Email:</label>
+                <input type="hidden" name="id" th:value="${user.getId()}">
+                <input type="email" class="form-control" id="email" name="email"
+                       placeholder="Name..." th:value="${user.getEmail()}">
+            </div>
+            <div class="form-group">
+                <label for="full_name">User Full name:</label>
+                <input type="text" class="form-control" id="full_name"
+                       name="full_name" placeholder="Price..." th:value="${user.getFull_name()}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save User</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteUser'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${user.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteUser}"
+                        style="float: right"></button>
+            </div>
+        </form>
+        <br>
+        <table class="table table-striped">
+            <tbody>
+            <tr th:each="role:${roles}">
+                <form th:action="@{'/setRole'}" method="post">
+                    <input type="hidden" th:value="${user.getId()}" name="user_id">
+                    <input type="hidden" th:value="${role.getId()}" name="role_id">
+                    <td th:text="${role.getRole()}"></td>
+                    <td width="10%">
+                        <button class="btn btn-md"
+                                th:classappend="${user.getRoles()!=null && user.getRoles().contains(role)} ? btn-danger:btn-success"
+                                th:text="${user.getRoles()!=null && user.getRoles().contains(role)} ? '–' : '+'"></button>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</html>

@@ -1,0 +1,27 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form method="POST" th:action="@{'/editCategory'}" id="edit_form">
+            <h2 th:text="${category.getName()}"></h2>
+            <div class="form-group">
+                <label for="category_name">Category Name:</label>
+                <input type="hidden" name="category_id" th:value="${category.getId()}">
+                <input type="text" class="form-control" id="category_name" name="category_name"
+                       placeholder="Name..." th:value="${category.getName()}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save Category</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteCategory'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${category.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteCategory}"
+                        style="float: right"></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</html>

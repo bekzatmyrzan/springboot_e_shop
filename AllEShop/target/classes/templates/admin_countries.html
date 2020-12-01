@@ -1,0 +1,73 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form>
+            <h2 th:text="#{menu.allItems}" style="float: left"></h2>
+            <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
+                    data-target="#addCountryModal">ADD NEW
+            </button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Code</th>
+                <th scope="col">Edit</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="country:${countries}">
+                <th scope="row" th:text="${country.getId()}"></th>
+                <td th:text="${country.getName()}"></td>
+                <td th:text="${country.getCode()}"></td>
+                <td><a th:href="@{'/admin_country_details/' + ${country.getId()}}">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="addCountryModal" tabindex="-1" role="dialog"
+             aria-labelledby="addCountryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" th:action="@{'/addCountry'}" id="add_form3">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCountryModalLabel"
+                                th:text="#{label.add} + #{label.new} + #{label.country}"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="country_name">Country Name:</label>
+                                <input type="text" class="form-control" id="country_name" name="country_name"
+                                       placeholder="Name...">
+                            </div>
+                            <div class="form-group">
+                                <label for="country_code">Country Code:</label>
+                                <input type="text" class="form-control" id="country_code" name="country_code"
+                                       placeholder="Code...">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark">Add Country</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</html>

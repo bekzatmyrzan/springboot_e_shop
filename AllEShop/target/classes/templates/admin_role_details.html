@@ -1,0 +1,32 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form method="POST" th:action="@{'/editRole'}" id="edit_form">
+            <h2 th:text="${role.getRole()}"></h2>
+            <div class="form-group">
+                <label for="role_name">Name:</label>
+                <input type="hidden" name="id" th:value="${role.getId()}">
+                <input type="text" class="form-control" id="role_name" name="role_name"
+                       placeholder="Name..." th:value="${role.getRole()}">
+            </div>
+            <div class="form-group">
+                <label for="role_description">Description:</label>
+                <input type="text" class="form-control" id="role_description"
+                       name="role_description" placeholder="Description..." th:value="${role.getDescription()}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save Role</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteRole'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${role.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteRole}"
+                        style="float: right"></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</html>

@@ -1,0 +1,32 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form method="POST" th:action="@{'/editCountry'}" id="edit_form">
+            <h2 th:text="${country.getName()}"></h2>
+            <div class="form-group">
+                <label for="country_name">Country Name:</label>
+                <input type="hidden" name="country_id" th:value="${country.getId()}">
+                <input type="text" class="form-control" id="country_name" name="country_name"
+                       placeholder="Name..." th:value="${country.getName()}">
+            </div>
+            <div class="form-group">
+                <label for="country_code">Country code:</label>
+                <input type="text" class="form-control" id="country_code"
+                       name="country_code" placeholder="Price..." th:value="${country.getCode()}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save Country</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteCountry'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${country.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteCountry}"
+                        style="float: right"></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</html>
