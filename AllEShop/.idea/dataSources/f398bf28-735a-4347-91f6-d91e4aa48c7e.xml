@@ -1229,58 +1229,62 @@
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <key id="380" parent="341" name="PRIMARY">
+    <column id="380" parent="341" name="description">
+      <Position>3</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <key id="381" parent="341" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="381" parent="342" name="id">
+    <column id="382" parent="342" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="382" parent="342" name="email">
+    <column id="383" parent="342" name="email">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="383" parent="342" name="full_name">
+    <column id="384" parent="342" name="full_name">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="384" parent="342" name="password">
+    <column id="385" parent="342" name="password">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <key id="385" parent="342" name="PRIMARY">
+    <key id="386" parent="342" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="386" parent="343" name="user_id">
+    <column id="387" parent="343" name="user_id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="387" parent="343" name="roles_id">
+    <column id="388" parent="343" name="roles_id">
       <Position>2</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="388" parent="343" name="FKfxgldwdsgyl221kqaum2l0dm9">
+    <index id="389" parent="343" name="FKfxgldwdsgyl221kqaum2l0dm9">
       <ColNames>user_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="389" parent="343" name="FK9qf4n9htwf2hlfnqoucqmyeg9">
+    <index id="390" parent="343" name="FK9qf4n9htwf2hlfnqoucqmyeg9">
       <ColNames>roles_id</ColNames>
       <Type>btree</Type>
     </index>
-    <foreign-key id="390" parent="343" name="FKfxgldwdsgyl221kqaum2l0dm9">
+    <foreign-key id="391" parent="343" name="FKfxgldwdsgyl221kqaum2l0dm9">
       <ColNames>user_id</ColNames>
       <RefTableName>t_users</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <foreign-key id="391" parent="343" name="FK9qf4n9htwf2hlfnqoucqmyeg9">
+    <foreign-key id="392" parent="343" name="FK9qf4n9htwf2hlfnqoucqmyeg9">
       <ColNames>roles_id</ColNames>
       <RefTableName>t_roles</RefTableName>
       <RefColNames>id</RefColNames>
