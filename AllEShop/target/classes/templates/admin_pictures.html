@@ -1,0 +1,75 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form>
+            <h2 th:text="#{menu.allPictures}" style="float: left"></h2>
+            <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
+                    data-target="#addPictureModal">ADD NEW
+            </button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">URL</th>
+                <th scope="col">Added</th>
+                <th scope="col">Edit</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="picture:${pictures}">
+                <th scope="row" th:text="${picture.getId()}"></th>
+                <td th:text="${picture.getUrl()}"></td>
+                <td th:text="${picture.getAdded_date()}"></td>
+                <td><a th:href="@{'/admin_picture_details/' + ${picture.getId()}}">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="addPictureModal" tabindex="-1" role="dialog"
+             aria-labelledby="addPictureModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" th:action="@{'/addPicture'}" id="add_form2" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addPictureModalLabel"
+                                th:text="#{label.add} + #{label.new}"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="customFile" name="picture_url">
+                                <label class="custom-file-label" for="customFile" th:text="#{button.ChooseFile}"></label>
+<!--                                <button class="btn btn-success mt-2" th:text="#{button.UploadFile}"></button>-->
+                            </div>
+                            <div>
+                                <label for="picture_item_id">Picture' Item:</label>
+                                <select class="form-control" name="picture_item_id" id="picture_item_id">
+                                    <option th:each="item:${items}" th:text="${item.getName()}"
+                                            th:value="${item.getId()}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark">Add Picture</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</html>

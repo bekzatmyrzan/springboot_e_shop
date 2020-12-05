@@ -44,6 +44,9 @@ public class HomeController {
     private BrandService brandService;
 
     @Autowired
+    private PictureService pictureService;
+
+    @Autowired
     private CountryService countryService;
 
     @Autowired
@@ -58,8 +61,15 @@ public class HomeController {
     @Value("${file.avatar.viewPath}")
     private String viewPath;
 
+    @Value("${file.item.viewPath}")
+    private String viewPathForItem;
+
     @Value("${file.avatar.uploadPath}")
     private String uploadPath;
+
+    @Value("${file.item.uploadPath}")
+    private String uploadPathForItem;
+
 
     @Value("${file.avatar.defaultPicture}")
     private String defaultPicture;
@@ -123,6 +133,17 @@ public class HomeController {
         return "admin_brands";
     }
 
+    @GetMapping(value = "/admin_pictures")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MODERATOR')")
+    public String admin_pictures(Model model) {
+        ArrayList<Picture> pictures = (ArrayList<Picture>) pictureService.getAllPictures();
+        List<Item> items = itemService.getAllItems();
+        model.addAttribute("items", items);
+        model.addAttribute("pictures", pictures);
+        model.addAttribute("currentUser", getUserData());
+        return "admin_pictures";
+    }
+
     @GetMapping(value = "/admin_users")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MODERATOR')")
     public String admin_users(Model model) {
@@ -156,6 +177,8 @@ public class HomeController {
         Item item = itemService.getItem(id);
         List<Brand> brands = brandService.getAllBrands();
         List<Category> categories = categoryService.getAllCategories();
+        List<Picture> pictures = pictureService.getAllPicturesByItem(item);
+        model.addAttribute("pictures", pictures);
         model.addAttribute("categories", categories);
         model.addAttribute("brands", brands);
         model.addAttribute("item", item);
@@ -220,6 +243,8 @@ public class HomeController {
         Item item = itemService.getItem(id);
         List<Brand> brands = brandService.getAllBrands();
         List<Category> categories = item.getCategories();
+        List<Picture> pictures = pictureService.getAllPicturesByItem(item);
+        model.addAttribute("pictures", pictures);
         model.addAttribute("categories", categories);
         model.addAttribute("brands", brands);
         model.addAttribute("item", item);
@@ -294,6 +319,40 @@ public class HomeController {
             itemService.addItem(item);
         }
         return "redirect:/admin_items";
+    }
+
+    @PostMapping(value = "/addPicture")
+    public String addPicture(
+            @RequestParam(name = "picture_url") MultipartFile file,
+            @RequestParam(name = "picture_item_id", defaultValue = "0") Long picture_item_id
+    ) {
+        if (file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png")) {
+            try {
+                Item item = itemService.getItem(picture_item_id);
+                if (item!=null) {
+//                    User currentUser = getUserData();
+//                    assert currentUser != null;
+                    int length = pictureService.getAllPictures().size();
+                    String picName = DigestUtils.sha1Hex("itemPhoto_" + item.getId() + length+ "_!Picture");
+                    byte[] bytes = file.getBytes();
+                    Path path = Paths.get(uploadPathForItem + picName + ".jpg");
+                    Files.write(path, bytes);
+                    Picture picture = new Picture();
+                    picture.setUrl(picName);
+                    Date currentDate = new Date(System.currentTimeMillis());
+                    picture.setAdded_date(currentDate);
+                    picture.setItem(item);
+                    //currentUser.setPicture_url(picName);
+                    pictureService.savePicture(picture);
+                    //userService.saveUser(currentUser);
+                    return "redirect:/admin_pictures?success";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "redirect:/admin_pictures?warning";
     }
 
     @PostMapping(value = "/addBrand")
@@ -469,6 +528,26 @@ public class HomeController {
             userService.saveUser(user2);
         }
         return "redirect:/admin_users";
+    }
+
+    @GetMapping(value = "/viewPictureOfItem/{url}",produces = {MediaType.IMAGE_JPEG_VALUE})
+    public @ResponseBody byte[] viewPictureOfItem(
+            @PathVariable(name = "url") String url)throws IOException {
+        String picture_url = viewPathForItem + defaultPicture;
+        if (url!=null){
+            picture_url = viewPathForItem + url+".jpg";
+        }
+        InputStream in;
+        try {
+            ClassPathResource resource = new ClassPathResource(picture_url);
+            in = resource.getInputStream();
+        }
+        catch (Exception e){
+            ClassPathResource resource = new ClassPathResource(viewPathForItem + defaultPicture);
+            in = resource.getInputStream();
+            e.printStackTrace();
+        }
+        return IOUtils.toByteArray(in);
     }
 
     @GetMapping(value = "/viewPhoto/{url}",produces = {MediaType.IMAGE_JPEG_VALUE})
