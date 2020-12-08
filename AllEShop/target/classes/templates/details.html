@@ -172,27 +172,34 @@
                         <h5 class="card-text text-center">Screenshots</h5>
                         <!--                        <img th:src="${pictures.get()}">-->
                         <!--                        <div class="card-group">-->
-
-                        <div th:if="${pictures!=null}">
-                            <img th:if="${pictures.size()>0}" th:src="@{'/viewPictureOfItem/' + ${pictures.get(0).getUrl()}}" class="my-3"
-                                 style="width: 100%">
-                        </div>
-                        <div class="card-group">
-                            <div th:each="picture:${pictures}" class="card">
-                                <img th:src="@{'/viewPictureOfItem/' + ${picture.getUrl()}}" class="my-3">
-                            </div>
-                        </div>
-                        <!--                        </div>-->
                     </div>
-                    <div class="card-footer">
+                    <div class="card-group">
+                        <div th:if="${pictures!=null}" th:each="picture:${pictures}" class="card"
+                             style="float: left">
+                            <img th:src="@{'/viewPictureOfItem/' + ${picture.getUrl()}}" style="width: 60%">
+                        </div>
+                    </div>
+                    <!--                        </div>-->
+                </div>
+                <div class="card-footer">
                         <span class="fa fa-star checked"
                               th:each="star:${#numbers.sequence(1,item.getStars(),1)}" style="color: orange">
                         </span>
-                        <span class="fa fa-star" th:each="star:${#numbers.sequence(item.getStars(),4,1)}">
+                    <span class="fa fa-star" th:each="star:${#numbers.sequence(item.getStars(),4,1)}">
                         </span>
-                    </div>
                 </div>
             </div>
+            <br>
+            <form method="post" th:action="@{'/addToBasket'}">
+                <input type="hidden" name="item_id" th:value="${item.getId()}">
+                <button class="btn btn-success">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-basket" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                    <a type="submit" th:text="#{button.addToBasket}"></a></button>
+            </form>
             <br>
             <div class="row mt-5">
                 <div class="col-6 offset-3">
@@ -215,92 +222,93 @@
                     </table>
                 </div>
             </div>
-            <br>
-            <!--            <div class="container">-->
-            <!--                <form th:action="@{'/deleteItem'}" method="post">-->
-            <!--                    <div class="form-group">-->
-            <!--                        <input type="hidden" name="id" th:value="${item.getId()}">-->
-            <!--                        <button type="submit" class="btn btn-primary" th:text="#{button.DeleteItem}"-->
-            <!--                                style="float: right"></button>-->
-            <!--                    </div>-->
-            <!--                </form>-->
-            <!--                <button class="btn btn-primary"-->
-            <!--                        data-toggle="modal" data-target="#editItemModal" style="float:left"-->
-            <!--                        th:text="#{button.EditItem}">-->
-            <!--                </button>-->
-            <!--            </div>-->
-            <!--            <div class="modal fade" id="editItemModal" tabindex="-1" role="dialog"-->
-            <!--                 aria-labelledby="editItemModalLabel" aria-hidden="true">-->
-            <!--                <div class="modal-dialog">-->
-            <!--                    <div class="modal-content">-->
-            <!--                        <form method="POST" th:action="@{'/editItem'}" id="edit_form">-->
-            <!--                            <div class="modal-header">-->
-            <!--                                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>-->
-            <!--                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
-            <!--                                    <span aria-hidden="true">&times;</span>-->
-            <!--                                </button>-->
-            <!--                            </div>-->
-            <!--                            <div class="modal-body">-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_name">Item Name:</label>-->
-            <!--                                    <input type="hidden" name="item_id" th:value="${item.getId()}">-->
-            <!--                                    <input type="text" class="form-control" id="item_name" name="item_name"-->
-            <!--                                           placeholder="Name..." th:value="${item.getName()}">-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_description">Item Description:</label>-->
-            <!--                                    <textarea type="text" class="form-control" id="item_description"-->
-            <!--                                              name="item_description" placeholder="Description..."-->
-            <!--                                              th:text="${item.getDescription()}"></textarea>-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_price">Item Price:</label>-->
-            <!--                                    <input type="number" class="form-control" id="item_price"-->
-            <!--                                           name="item_price" placeholder="Price..." th:value="${item.getPrice()}">-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_stars">Item Stars:</label>-->
-            <!--                                    <input type="number" class="form-control" id="item_stars"-->
-            <!--                                           name="item_stars" placeholder="Stars..." th:value="${item.getStars()}">-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_smallPicURL">item smallPicURL:</label>-->
-            <!--                                    <input type="text" class="form-control" id="item_smallPicURL"-->
-            <!--                                           name="item_smallPicURL"-->
-            <!--                                           placeholder="smallPicURL..." th:value="${item.getSmallPicURL()}">-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_largePicURL">item largePicURL:</label>-->
-            <!--                                    <input type="text" class="form-control" id="item_largePicURL"-->
-            <!--                                           name="item_largePicURL"-->
-            <!--                                           placeholder="largePicURL..." th:value="${item.getLargePicURL()}">-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label for="item_largePicURL">item Brand:</label>-->
-            <!--                                    <select class="form-control" name="item_brand_id">-->
-            <!--                                        <option th:each="brand:${brands}" th:text="${brand.getName()}"-->
-            <!--                                                th:value="${brand.getId()}"-->
-            <!--                                                th:selected="${item.getBrand()==brand}"></option>-->
-            <!--                                    </select>-->
-            <!--                                </div>-->
-            <!--                                <div class="form-group">-->
-            <!--                                    <label>Show in Top page:</label>-->
-            <!--                                    <select class="form-control" name="item_inTopPage">-->
-            <!--                                        <option value="no" th:selected="${!item.getInTopPage()}">NO</option>-->
-            <!--                                        <option value="yes" th:selected="${item.getInTopPage()}">YES</option>-->
-            <!--                                    </select>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                            <div class="modal-footer">-->
-            <!--                                <button type="submit" class="btn btn-dark">Save Item</button>-->
-            <!--                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close-->
-            <!--                                </button>-->
-            <!--                            </div>-->
-            <!--                        </form>-->
-            <!--                    </div>-->
-            <!--                </div>-->
-            <!--            </div>-->
         </div>
+        <br>
+        <!--            <div class="container">-->
+        <!--                <form th:action="@{'/deleteItem'}" method="post">-->
+        <!--                    <div class="form-group">-->
+        <!--                        <input type="hidden" name="id" th:value="${item.getId()}">-->
+        <!--                        <button type="submit" class="btn btn-primary" th:text="#{button.DeleteItem}"-->
+        <!--                                style="float: right"></button>-->
+        <!--                    </div>-->
+        <!--                </form>-->
+        <!--                <button class="btn btn-primary"-->
+        <!--                        data-toggle="modal" data-target="#editItemModal" style="float:left"-->
+        <!--                        th:text="#{button.EditItem}">-->
+        <!--                </button>-->
+        <!--            </div>-->
+        <!--            <div class="modal fade" id="editItemModal" tabindex="-1" role="dialog"-->
+        <!--                 aria-labelledby="editItemModalLabel" aria-hidden="true">-->
+        <!--                <div class="modal-dialog">-->
+        <!--                    <div class="modal-content">-->
+        <!--                        <form method="POST" th:action="@{'/editItem'}" id="edit_form">-->
+        <!--                            <div class="modal-header">-->
+        <!--                                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>-->
+        <!--                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+        <!--                                    <span aria-hidden="true">&times;</span>-->
+        <!--                                </button>-->
+        <!--                            </div>-->
+        <!--                            <div class="modal-body">-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_name">Item Name:</label>-->
+        <!--                                    <input type="hidden" name="item_id" th:value="${item.getId()}">-->
+        <!--                                    <input type="text" class="form-control" id="item_name" name="item_name"-->
+        <!--                                           placeholder="Name..." th:value="${item.getName()}">-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_description">Item Description:</label>-->
+        <!--                                    <textarea type="text" class="form-control" id="item_description"-->
+        <!--                                              name="item_description" placeholder="Description..."-->
+        <!--                                              th:text="${item.getDescription()}"></textarea>-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_price">Item Price:</label>-->
+        <!--                                    <input type="number" class="form-control" id="item_price"-->
+        <!--                                           name="item_price" placeholder="Price..." th:value="${item.getPrice()}">-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_stars">Item Stars:</label>-->
+        <!--                                    <input type="number" class="form-control" id="item_stars"-->
+        <!--                                           name="item_stars" placeholder="Stars..." th:value="${item.getStars()}">-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_smallPicURL">item smallPicURL:</label>-->
+        <!--                                    <input type="text" class="form-control" id="item_smallPicURL"-->
+        <!--                                           name="item_smallPicURL"-->
+        <!--                                           placeholder="smallPicURL..." th:value="${item.getSmallPicURL()}">-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_largePicURL">item largePicURL:</label>-->
+        <!--                                    <input type="text" class="form-control" id="item_largePicURL"-->
+        <!--                                           name="item_largePicURL"-->
+        <!--                                           placeholder="largePicURL..." th:value="${item.getLargePicURL()}">-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="item_largePicURL">item Brand:</label>-->
+        <!--                                    <select class="form-control" name="item_brand_id">-->
+        <!--                                        <option th:each="brand:${brands}" th:text="${brand.getName()}"-->
+        <!--                                                th:value="${brand.getId()}"-->
+        <!--                                                th:selected="${item.getBrand()==brand}"></option>-->
+        <!--                                    </select>-->
+        <!--                                </div>-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label>Show in Top page:</label>-->
+        <!--                                    <select class="form-control" name="item_inTopPage">-->
+        <!--                                        <option value="no" th:selected="${!item.getInTopPage()}">NO</option>-->
+        <!--                                        <option value="yes" th:selected="${item.getInTopPage()}">YES</option>-->
+        <!--                                    </select>-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                            <div class="modal-footer">-->
+        <!--                                <button type="submit" class="btn btn-dark">Save Item</button>-->
+        <!--                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close-->
+        <!--                                </button>-->
+        <!--                            </div>-->
+        <!--                        </form>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
     </div>
+</div>
 </div>
 </html>

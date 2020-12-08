@@ -1,0 +1,67 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
+                data-target="#addPictureModal">ADD NEW Picture
+        </button>
+        <h2 th:value="${item.getName()}"></h2>
+        <h2 th:text="#{label.pictures}"></h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Picture</th>
+                <th scope="col">URL</th>
+                <th scope="col">Added Date</th>
+                <th scope="col">        </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="picture:${pictures}">
+                <form th:action="@{'/addPictureToItem'}" method="post">
+                    <input type="hidden" th:value="${item.getId()}" name="item_id">
+                    <input type="hidden" th:value="${picture.getId()}" name="picture_id">
+                    <td ><img th:src="@{'/viewPictureOfItem/' + ${picture.getUrl()}}" style="width: 80%"></td>
+                    <td th:text="${picture.getUrl()}"></td>
+                    <td th:text="${picture.getAdded_date()}"></td>
+                    <td width="10%">
+                        <button type="submit" class="btn btn-md btn-success">+</button>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="addPictureModal" tabindex="-1" role="dialog"
+         aria-labelledby="addPictureModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" th:action="@{'/addPicture'}" id="add_form2" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPictureModalLabel"
+                            th:text="#{label.add} + #{label.new}"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="customFile" name="picture_url">
+                            <label class="custom-file-label" for="customFile" th:text="#{button.ChooseFile}"></label>
+                            <!--                                <button class="btn btn-success mt-2" th:text="#{button.UploadFile}"></button>-->
+                        </div>
+                        <input type="hidden" name="picture_item_id" th:value="${item.getId()}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-dark">Add Picture</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</html>

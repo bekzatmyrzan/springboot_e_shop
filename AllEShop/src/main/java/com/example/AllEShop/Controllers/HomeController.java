@@ -4,10 +4,13 @@ import com.example.AllEShop.entities.*;
 import com.example.AllEShop.services.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,15 +21,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 public class HomeController {
@@ -76,7 +89,23 @@ public class HomeController {
 
 
     @GetMapping(value = "/")
-    public String index(Model model) {
+    public String index(Model model,HttpServletResponse response,HttpServletRequest request) {
+
+//        Cookie cookie = new Cookie("basket_items","start!!");
+//        response.addCookie(cookie);
+        HttpSession session = request.getSession();
+        double total = 0.0;
+        if (session.getAttribute("basket_items")!=null) {
+            ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
+            if (basket_items == null) {
+                basket_items = new ArrayList<>();
+                session.setAttribute("basket_items",basket_items);
+            }
+            for (ItemForBasket itemForBasket:basket_items) {
+                total+= itemForBasket.getItem().getPrice()*itemForBasket.getAmount();
+            }
+        }
+        session.setAttribute("total",total);
         ArrayList<Item> items = itemService.getAllItemsTopPage();
         model.addAttribute("items", items);
         List<Brand> brands = brandService.getAllBrands();
@@ -86,6 +115,26 @@ public class HomeController {
         List<Language> languages = languageService.getAllLanguages();
         model.addAttribute("currentUser", getUserData());
         return "index";
+    }
+
+    @GetMapping(value = "/basket")
+    public String basket(Model model,HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
+        if (basket_items==null){
+            basket_items = new ArrayList<>();
+        }
+        double total = 0.0;
+        for (ItemForBasket itemForBasket:basket_items) {
+            total+= itemForBasket.getItem().getPrice()*itemForBasket.getAmount();
+        }
+        session.setAttribute("total",total);
+
+//        model.addAttribute("total", total);
+        model.addAttribute("basket_items", basket_items);
+        model.addAttribute("currentUser", getUserData());
+        return "basket";
     }
 
     @GetMapping(value = "/admin_items")
@@ -132,6 +181,21 @@ public class HomeController {
         model.addAttribute("currentUser", getUserData());
         return "admin_brands";
     }
+
+//    @GetMapping(value = "/admin_add_picture_to_item")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MODERATOR')")
+//    public String admin_add_picture_to_item(Model model,
+//                                            @RequestParam(name = "item_id", defaultValue = "0") Long item_id) {
+//        Item item = itemService.getItem(item_id);
+//        ArrayList<Picture> pictures = (ArrayList<Picture>) pictureService.getAllPictures();
+//        if (item!=null && pictures!=null) {
+//            model.addAttribute("item", item);
+//            model.addAttribute("pictures", pictures);
+//            model.addAttribute("currentUser", getUserData());
+//            return "admin_add_picture_to_item";
+//        }
+//        return "redirect:/";
+//    }
 
     @GetMapping(value = "/admin_pictures")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MODERATOR')")
@@ -302,6 +366,128 @@ public class HomeController {
         return "search";
     }
 
+    @PostMapping(value = "/addToBasket")
+    public String addToBasket(
+            Model model,
+            @RequestParam(name = "item_id", defaultValue = "0") Long item_id,
+            HttpServletRequest request
+    ) {
+        HttpSession session = request.getSession();
+        ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
+        if (basket_items==null){
+            basket_items = new ArrayList<>();
+        }
+        Item item = itemService.getItem(item_id);
+        boolean contain = false;
+        if (basket_items.size()!=0) {
+            for (ItemForBasket it : basket_items) {
+                if (it.getItem().getId().equals(item_id)) {
+                    it.setAmount(it.getAmount() + 1);
+                    contain = true;
+                    break;
+                }
+            }
+        }
+        if (!contain){
+            ItemForBasket itemForBasket = new ItemForBasket();
+            itemForBasket.setAmount(1);
+            itemForBasket.setItem(item);
+            basket_items.add(itemForBasket);
+        }
+        session.setAttribute("basket_items",basket_items);
+
+        model.addAttribute("basket_items", basket_items);
+
+        ArrayList<Item> items = itemService.getAllItemsTopPage();
+        model.addAttribute("items", items);
+        List<Brand> brands = brandService.getAllBrands();
+        model.addAttribute("brands", brands);
+        List<Country> countries = countryService.getAllCountries();
+        model.addAttribute("countries", countries);
+        model.addAttribute("currentUser", getUserData());
+        return "redirect:/";
+    }
+
+    @PostMapping(value = "/increaseAmount")
+    public String increaseAmount(
+            Model model,
+            @RequestParam(name = "item_id", defaultValue = "0") Long item_id,
+            HttpServletRequest request
+    ) {
+        HttpSession session = request.getSession();
+        ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
+
+        Double total = 0.0;
+        if (basket_items==null){
+            basket_items = new ArrayList<>();
+        }
+        if (basket_items.size()!=0) {
+            for (ItemForBasket it : basket_items) {
+                if (it.getItem().getId().equals(item_id)) {
+                    it.setAmount(it.getAmount() + 1);
+                    total += it.getItem().getPrice();
+                    break;
+                }
+            }
+        }
+        session.setAttribute("basket_items",basket_items);
+
+        session.setAttribute("total",total);
+        //model.addAttribute("total", total);
+        model.addAttribute("basket_items", basket_items);
+        model.addAttribute("currentUser", getUserData());
+        return "redirect:/basket";
+    }
+
+    @PostMapping(value = "/decreaseAmount")
+    public String decreaseAmount(
+            Model model,
+            @RequestParam(name = "item_id", defaultValue = "0") Long item_id,
+            HttpServletRequest request
+    ) {
+        HttpSession session = request.getSession();
+        ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
+        Double total = 0.0;
+        if (basket_items==null){
+            basket_items = new ArrayList<>();
+        }
+        if (basket_items.size()!=0) {
+            for (ItemForBasket it : basket_items) {
+                if (it.getItem().getId().equals(item_id)) {
+                    it.setAmount(it.getAmount() - 1);
+                    total -= it.getItem().getPrice();
+                    if (it.getAmount()==0){
+                        basket_items.remove(it);
+                    }
+                    break;
+                }
+            }
+        }
+        session.setAttribute("basket_items",basket_items);
+
+        session.setAttribute("total",total);
+//        model.addAttribute("total", total);
+        model.addAttribute("basket_items", basket_items);
+        model.addAttribute("currentUser", getUserData());
+        return "redirect:/basket";
+    }
+
+    @PostMapping(value = "/clearBasket")
+    public String clearBasket(
+            Model model,
+            HttpServletRequest request
+    ) {
+        HttpSession session = request.getSession();
+        ArrayList<ItemForBasket> basket_items = new ArrayList<>();
+        Double total = 0.0;
+        session.setAttribute("basket_items",basket_items);
+        session.setAttribute("total",total);
+//        model.addAttribute("total", total);
+        model.addAttribute("basket_items", basket_items);
+        model.addAttribute("currentUser", getUserData());
+        return "redirect:/basket";
+    }
+
     @PostMapping(value = "/addItem")
     public String addItem(@RequestParam(name = "item_name", defaultValue = "Default name") String name,
                           @RequestParam(name = "item_description", defaultValue = "Default description") String description,
@@ -322,6 +508,7 @@ public class HomeController {
     }
 
     @PostMapping(value = "/addPicture")
+    @PreAuthorize("isAuthenticated()")
     public String addPicture(
             @RequestParam(name = "picture_url") MultipartFile file,
             @RequestParam(name = "picture_item_id", defaultValue = "0") Long picture_item_id
@@ -350,6 +537,57 @@ public class HomeController {
 
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+        return "redirect:/admin_pictures?warning";
+    }
+
+//    @PostMapping(value = "/addPictureToItem")
+//    @PreAuthorize("isAuthenticated()")
+//    public String addPictureToItem(
+//            @RequestParam(name = "item_id", defaultValue = "0") Long item_id,
+//            @RequestParam(name = "picture_id", defaultValue = "0") Long picture_id
+//    ) {
+//        if (item_id!=null && picture_id!=null) {
+//            try {
+//                Item item = itemService.getItem(item_id);
+//                if (item!=null) {
+////                    int length = pictureService.getAllPictures().size();
+////                    String picName = DigestUtils.sha1Hex("itemPhoto_" + item.getId() + length+ "_!Picture");
+////                    byte[] bytes = file.getBytes();
+////                    Path path = Paths.get(uploadPathForItem + picName + ".jpg");
+////                    Files.write(path, bytes);
+////                    Picture picture = new Picture();
+////                    picture.setUrl(picName);
+////                    Date currentDate = new Date(System.currentTimeMillis());
+////                    picture.setAdded_date(currentDate);
+//                    Picture picture = pictureService.getPicture(picture_id);
+//                    if (picture!=null) {
+//                        picture.setItem(item);
+//                        pictureService.savePicture(picture);
+//                        return "redirect:/admin_pictures?success";
+//                    }
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return "redirect:/admin_pictures?warning";
+//    }
+
+    @PostMapping(value = "/removePicture")
+    @PreAuthorize("isAuthenticated()")
+    public String removePicture(
+            @RequestParam(name = "item_id", defaultValue = "0") Long item_id,
+            @RequestParam(name = "picture_id", defaultValue = "0") Long picture_id
+    ) {
+        Item item = itemService.getItem(item_id);
+        if (item!=null) {
+            Picture picture = pictureService.getPicture(picture_id);
+            if (picture!=null){
+                picture.setItem(null);
+                return "redirect:/admin_items";
             }
         }
         return "redirect:/admin_pictures?warning";
@@ -532,7 +770,7 @@ public class HomeController {
 
     @GetMapping(value = "/viewPictureOfItem/{url}",produces = {MediaType.IMAGE_JPEG_VALUE})
     public @ResponseBody byte[] viewPictureOfItem(
-            @PathVariable(name = "url") String url)throws IOException {
+            @PathVariable(name = "url") String url,HttpSession session)throws IOException {
         String picture_url = viewPathForItem + defaultPicture;
         if (url!=null){
             picture_url = viewPathForItem + url+".jpg";
@@ -608,6 +846,7 @@ public class HomeController {
             user2.setFull_name(full_name);
             user2.setPassword(user.getPassword());
             user2.setRoles(user.getRoles());
+            user2.setPicture_url(user.getPicture_url());
             userService.saveUser(user2);
         }
         model.addAttribute("error", "noerr");
@@ -634,6 +873,7 @@ public class HomeController {
                     newUser.setFull_name(user.getFull_name());
                     newUser.setEmail(user.getEmail());
                     newUser.setRoles(user.getRoles());
+                    newUser.setPicture_url(user.getPicture_url());
                     newUser.setPassword(encryptedNewPassword);
                     userService.saveUser(newUser);
                 }

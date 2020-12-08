@@ -14,6 +14,7 @@
                 <th scope="col">ID</th>
                 <th scope="col">URL</th>
                 <th scope="col">Added</th>
+                <th scope="col">Item</th>
                 <th scope="col">Edit</th>
             </tr>
             </thead>
@@ -22,7 +23,8 @@
                 <th scope="row" th:text="${picture.getId()}"></th>
                 <td th:text="${picture.getUrl()}"></td>
                 <td th:text="${picture.getAdded_date()}"></td>
-                <td><a th:href="@{'/admin_picture_details/' + ${picture.getId()}}">
+                <td th:text="${picture.getItem().getName()}"></td>
+                <td><a href="#">
                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor"
                          xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"

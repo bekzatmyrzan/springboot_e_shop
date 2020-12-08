@@ -5,89 +5,116 @@
         <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
                 data-target="#addPictureModal">ADD NEW Picture
         </button>
-            <form method="POST" th:action="@{'/editItem'}" id="edit_form">
-                <h2 th:text="${item.getName()}"></h2>
-                <div class="form-group">
-                    <label for="item_name">Item Name:</label>
-                    <input type="hidden" name="item_id" th:value="${item.getId()}">
-                    <input type="text" class="form-control" id="item_name" name="item_name"
-                           placeholder="Name..." th:value="${item.getName()}">
-                </div>
-                <div class="form-group">
-                    <label for="item_description">Item Description:</label>
-                    <textarea type="text" class="form-control" id="item_description"
-                              name="item_description" placeholder="Description..."
-                              th:text="${item.getDescription()}"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="item_price">Item Price:</label>
-                    <input type="number" class="form-control" id="item_price"
-                           name="item_price" placeholder="Price..." th:value="${item.getPrice()}">
-                </div>
-                <div class="form-group">
-                    <label for="item_stars">Item Stars:</label>
-                    <input type="number" class="form-control" id="item_stars"
-                           name="item_stars" placeholder="Stars..." th:value="${item.getStars()}">
-                </div>
-                <div class="form-group">
-                    <label for="item_smallPicURL">item smallPicURL:</label>
-                    <input type="text" class="form-control" id="item_smallPicURL"
-                           name="item_smallPicURL"
-                           placeholder="smallPicURL..." th:value="${item.getSmallPicURL()}">
-                </div>
-                <div class="form-group">
-                    <label for="item_largePicURL">item largePicURL:</label>
-                    <input type="text" class="form-control" id="item_largePicURL"
-                           name="item_largePicURL"
-                           placeholder="largePicURL..." th:value="${item.getLargePicURL()}">
-                </div>
-                <div class="form-group">
-                    <label for="item_largePicURL">item Brand:</label>
-                    <select class="form-control" name="item_brand_id">
-                        <option th:each="brand:${brands}" th:text="${brand.getName()}"
-                                th:value="${brand.getId()}"
-                                th:selected="${item.getBrand()==brand}"></option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Show in Top page:</label>
-                    <select class="form-control" name="item_inTopPage">
-                        <option value="no" th:selected="${!item.getInTopPage()}">NO</option>
-                        <option value="yes" th:selected="${item.getInTopPage()}">YES</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success" style="float: left">Save Item</button>
-                </div>
-            </form>
-            <form th:action="@{'/deleteItem'}" method="post">
-                <div class="form-group">
-                    <input type="hidden" name="id" th:value="${item.getId()}">
-                    <button type="submit" class="btn btn-danger" th:text="#{button.DeleteItem}"
-                            style="float: right"></button>
-                </div>
-            </form>
-            <br>
-            <br>
-            <h2 th:text="#{label.categories}"></h2>
-            <table class="table table-striped">
-                <tbody>
-                <tr th:each="category:${categories}">
-                    <form th:action="@{'/setCategory'}" method="post">
-                        <input type="hidden" th:value="${item.getId()}" name="item_id">
-                        <input type="hidden" th:value="${category.getId()}" name="category_id">
-                        <td th:text="${category.getName()}"></td>
-                        <td width="10%">
+        <form method="POST" th:action="@{'/editItem'}" id="edit_form">
+            <h2 th:text="${item.getName()}"></h2>
+            <div class="form-group">
+                <label for="item_name">Item Name:</label>
+                <input type="hidden" name="item_id" th:value="${item.getId()}">
+                <input type="text" class="form-control" id="item_name" name="item_name"
+                       placeholder="Name..." th:value="${item.getName()}">
+            </div>
+            <div class="form-group">
+                <label for="item_description">Item Description:</label>
+                <textarea type="text" class="form-control" id="item_description"
+                          name="item_description" placeholder="Description..."
+                          th:text="${item.getDescription()}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="item_price">Item Price:</label>
+                <input type="number" class="form-control" id="item_price"
+                       name="item_price" placeholder="Price..." th:value="${item.getPrice()}">
+            </div>
+            <div class="form-group">
+                <label for="item_stars">Item Stars:</label>
+                <input type="number" class="form-control" id="item_stars"
+                       name="item_stars" placeholder="Stars..." th:value="${item.getStars()}">
+            </div>
+            <div class="form-group">
+                <label for="item_smallPicURL">item smallPicURL:</label>
+                <input type="text" class="form-control" id="item_smallPicURL"
+                       name="item_smallPicURL"
+                       placeholder="smallPicURL..." th:value="${item.getSmallPicURL()}">
+            </div>
+            <div class="form-group">
+                <label for="item_largePicURL">item largePicURL:</label>
+                <input type="text" class="form-control" id="item_largePicURL"
+                       name="item_largePicURL"
+                       placeholder="largePicURL..." th:value="${item.getLargePicURL()}">
+            </div>
+            <div class="form-group">
+                <label for="item_largePicURL">item Brand:</label>
+                <select class="form-control" name="item_brand_id">
+                    <option th:each="brand:${brands}" th:text="${brand.getName()}"
+                            th:value="${brand.getId()}"
+                            th:selected="${item.getBrand()==brand}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Show in Top page:</label>
+                <select class="form-control" name="item_inTopPage">
+                    <option value="no" th:selected="${!item.getInTopPage()}">NO</option>
+                    <option value="yes" th:selected="${item.getInTopPage()}">YES</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success" style="float: left">Save Item</button>
+            </div>
+        </form>
+        <form th:action="@{'/deleteItem'}" method="post">
+            <div class="form-group">
+                <input type="hidden" name="id" th:value="${item.getId()}">
+                <button type="submit" class="btn btn-danger" th:text="#{button.DeleteItem}"
+                        style="float: right"></button>
+            </div>
+        </form>
+        <br>
+        <br>
+        <h2 th:text="#{label.categories}"></h2>
+        <table class="table table-striped">
+            <tbody>
+            <tr th:each="category:${categories}">
+                <form th:action="@{'/setCategory'}" method="post">
+                    <input type="hidden" th:value="${item.getId()}" name="item_id">
+                    <input type="hidden" th:value="${category.getId()}" name="category_id">
+                    <td th:text="${category.getName()}"></td>
+                    <td width="10%">
 
-                            <button class="btn btn-md"
-                                    th:classappend="${item.getCategories()!=null && item.getCategories().contains(category)} ? btn-danger:btn-success"
-                                    th:text="${item.getCategories()!=null && item.getCategories().contains(category)} ? '-' : '+'"></button>
-                        </td>
-                    </form>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+                        <button class="btn btn-md"
+                                th:classappend="${item.getCategories()!=null && item.getCategories().contains(category)} ? btn-danger:btn-success"
+                                th:text="${item.getCategories()!=null && item.getCategories().contains(category)} ? '-' : '+'"></button>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+        <br>
+        <h2 th:text="#{label.pictures}"></h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Picture</th>
+                <th scope="col">URL</th>
+                <th scope="col">Added Date</th>
+                <th scope="col">        </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="picture:${pictures}">
+                <form th:action="@{'/removePicture'}" method="post">
+                    <input type="hidden" th:value="${item.getId()}" name="item_id">
+                    <input type="hidden" th:value="${picture.getId()}" name="picture_id">
+                    <td ><img th:src="@{'/viewPictureOfItem/' + ${picture.getUrl()}}" style="width: 80%"></td>
+                    <td th:text="${picture.getUrl()}"></td>
+                    <td th:text="${picture.getAdded_date()}"></td>
+                    <td width="10%">
+                        <button type="submit" class="btn btn-md btn-danger">-</button>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <div class="modal fade" id="addPictureModal" tabindex="-1" role="dialog"
          aria-labelledby="addPictureModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -117,7 +144,7 @@
             </div>
         </div>
     </div>
-    </div>
+</div>
 </div>
 
 </html>
