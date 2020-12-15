@@ -18,6 +18,7 @@
            </form>
             <br>
             <p>If you are not registered, click <a th:href="@{'/registration'}">here</a></p>
+            <p style="color: red" th:if="${error!='noerr'}" th:text="${error}"></p>
         </div>
     </div>
 

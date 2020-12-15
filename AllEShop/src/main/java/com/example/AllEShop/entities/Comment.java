@@ -8,23 +8,26 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "t_pictures")
+@Table(name = "t_comments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Picture {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "url")
-    private String url;
+    @Column(name = "comment")
+    private String comment;
 
     @Column(name = "added_date")
-    private Date added_date;
+    private Date addedDate;
 
     @ManyToOne()
     private Item item;
+
+    @ManyToOne()
+    private User author;
 }

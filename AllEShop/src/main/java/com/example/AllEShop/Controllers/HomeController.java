@@ -63,13 +63,13 @@ public class HomeController {
     private CountryService countryService;
 
     @Autowired
-    private LanguageService languageService;
-
-    @Autowired
     private CategoryService categoryService;
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private CommentService commentService;
 
     @Value("${file.avatar.viewPath}")
     private String viewPath;
@@ -89,47 +89,46 @@ public class HomeController {
 
 
     @GetMapping(value = "/")
-    public String index(Model model,HttpServletResponse response,HttpServletRequest request) {
+    public String index(Model model, HttpServletResponse response, HttpServletRequest request) {
 
 //        Cookie cookie = new Cookie("basket_items","start!!");
 //        response.addCookie(cookie);
         HttpSession session = request.getSession();
         double total = 0.0;
-        if (session.getAttribute("basket_items")!=null) {
+        if (session.getAttribute("basket_items") != null) {
             ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
             if (basket_items == null) {
                 basket_items = new ArrayList<>();
-                session.setAttribute("basket_items",basket_items);
+                session.setAttribute("basket_items", basket_items);
             }
-            for (ItemForBasket itemForBasket:basket_items) {
-                total+= itemForBasket.getItem().getPrice()*itemForBasket.getAmount();
+            for (ItemForBasket itemForBasket : basket_items) {
+                total += itemForBasket.getItem().getPrice() * itemForBasket.getAmount();
             }
         }
-        session.setAttribute("total",total);
+        session.setAttribute("total", total);
         ArrayList<Item> items = itemService.getAllItemsTopPage();
         model.addAttribute("items", items);
         List<Brand> brands = brandService.getAllBrands();
         model.addAttribute("brands", brands);
         List<Country> countries = countryService.getAllCountries();
         model.addAttribute("countries", countries);
-        List<Language> languages = languageService.getAllLanguages();
         model.addAttribute("currentUser", getUserData());
         return "index";
     }
 
     @GetMapping(value = "/basket")
-    public String basket(Model model,HttpServletRequest request) {
+    public String basket(Model model, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
-        if (basket_items==null){
+        if (basket_items == null) {
             basket_items = new ArrayList<>();
         }
         double total = 0.0;
-        for (ItemForBasket itemForBasket:basket_items) {
-            total+= itemForBasket.getItem().getPrice()*itemForBasket.getAmount();
+        for (ItemForBasket itemForBasket : basket_items) {
+            total += itemForBasket.getItem().getPrice() * itemForBasket.getAmount();
         }
-        session.setAttribute("total",total);
+        session.setAttribute("total", total);
 
 //        model.addAttribute("total", total);
         model.addAttribute("basket_items", basket_items);
@@ -146,7 +145,6 @@ public class HomeController {
         model.addAttribute("brands", brands);
         List<Country> countries = countryService.getAllCountries();
         model.addAttribute("countries", countries);
-        List<Language> languages = languageService.getAllLanguages();
         model.addAttribute("currentUser", getUserData());
         return "admin_items";
     }
@@ -180,6 +178,14 @@ public class HomeController {
         model.addAttribute("brands", brands);
         model.addAttribute("currentUser", getUserData());
         return "admin_brands";
+    }
+
+    @GetMapping(value = "/admin_comments")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MODERATOR')")
+    public String admin_comments(Model model) {
+        ArrayList<Comment> comments = (ArrayList<Comment>) commentService.getAllComments();
+        model.addAttribute("comments", comments);
+        return "admin_comments";
     }
 
 //    @GetMapping(value = "/admin_add_picture_to_item")
@@ -308,9 +314,11 @@ public class HomeController {
         List<Brand> brands = brandService.getAllBrands();
         List<Category> categories = item.getCategories();
         List<Picture> pictures = pictureService.getAllPicturesByItem(item);
+        List<Comment> comments = commentService.getAllCommentsByItem(item);
         model.addAttribute("pictures", pictures);
         model.addAttribute("categories", categories);
         model.addAttribute("brands", brands);
+        model.addAttribute("comments", comments);
         model.addAttribute("item", item);
         model.addAttribute("currentUser", getUserData());
         return "details";
@@ -374,12 +382,12 @@ public class HomeController {
     ) {
         HttpSession session = request.getSession();
         ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
-        if (basket_items==null){
+        if (basket_items == null) {
             basket_items = new ArrayList<>();
         }
         Item item = itemService.getItem(item_id);
         boolean contain = false;
-        if (basket_items.size()!=0) {
+        if (basket_items.size() != 0) {
             for (ItemForBasket it : basket_items) {
                 if (it.getItem().getId().equals(item_id)) {
                     it.setAmount(it.getAmount() + 1);
@@ -388,13 +396,13 @@ public class HomeController {
                 }
             }
         }
-        if (!contain){
+        if (!contain) {
             ItemForBasket itemForBasket = new ItemForBasket();
             itemForBasket.setAmount(1);
             itemForBasket.setItem(item);
             basket_items.add(itemForBasket);
         }
-        session.setAttribute("basket_items",basket_items);
+        session.setAttribute("basket_items", basket_items);
 
         model.addAttribute("basket_items", basket_items);
 
@@ -418,10 +426,10 @@ public class HomeController {
         ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
 
         Double total = 0.0;
-        if (basket_items==null){
+        if (basket_items == null) {
             basket_items = new ArrayList<>();
         }
-        if (basket_items.size()!=0) {
+        if (basket_items.size() != 0) {
             for (ItemForBasket it : basket_items) {
                 if (it.getItem().getId().equals(item_id)) {
                     it.setAmount(it.getAmount() + 1);
@@ -430,9 +438,9 @@ public class HomeController {
                 }
             }
         }
-        session.setAttribute("basket_items",basket_items);
+        session.setAttribute("basket_items", basket_items);
 
-        session.setAttribute("total",total);
+        session.setAttribute("total", total);
         //model.addAttribute("total", total);
         model.addAttribute("basket_items", basket_items);
         model.addAttribute("currentUser", getUserData());
@@ -448,24 +456,24 @@ public class HomeController {
         HttpSession session = request.getSession();
         ArrayList<ItemForBasket> basket_items = (ArrayList<ItemForBasket>) session.getAttribute("basket_items");
         Double total = 0.0;
-        if (basket_items==null){
+        if (basket_items == null) {
             basket_items = new ArrayList<>();
         }
-        if (basket_items.size()!=0) {
+        if (basket_items.size() != 0) {
             for (ItemForBasket it : basket_items) {
                 if (it.getItem().getId().equals(item_id)) {
                     it.setAmount(it.getAmount() - 1);
                     total -= it.getItem().getPrice();
-                    if (it.getAmount()==0){
+                    if (it.getAmount() == 0) {
                         basket_items.remove(it);
                     }
                     break;
                 }
             }
         }
-        session.setAttribute("basket_items",basket_items);
+        session.setAttribute("basket_items", basket_items);
 
-        session.setAttribute("total",total);
+        session.setAttribute("total", total);
 //        model.addAttribute("total", total);
         model.addAttribute("basket_items", basket_items);
         model.addAttribute("currentUser", getUserData());
@@ -480,8 +488,8 @@ public class HomeController {
         HttpSession session = request.getSession();
         ArrayList<ItemForBasket> basket_items = new ArrayList<>();
         Double total = 0.0;
-        session.setAttribute("basket_items",basket_items);
-        session.setAttribute("total",total);
+        session.setAttribute("basket_items", basket_items);
+        session.setAttribute("total", total);
 //        model.addAttribute("total", total);
         model.addAttribute("basket_items", basket_items);
         model.addAttribute("currentUser", getUserData());
@@ -516,11 +524,11 @@ public class HomeController {
         if (file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png")) {
             try {
                 Item item = itemService.getItem(picture_item_id);
-                if (item!=null) {
+                if (item != null) {
 //                    User currentUser = getUserData();
 //                    assert currentUser != null;
                     int length = pictureService.getAllPictures().size();
-                    String picName = DigestUtils.sha1Hex("itemPhoto_" + item.getId() + length+ "_!Picture");
+                    String picName = DigestUtils.sha1Hex("itemPhoto_" + item.getId() + length + "_!Picture");
                     byte[] bytes = file.getBytes();
                     Path path = Paths.get(uploadPathForItem + picName + ".jpg");
                     Files.write(path, bytes);
@@ -583,9 +591,9 @@ public class HomeController {
             @RequestParam(name = "picture_id", defaultValue = "0") Long picture_id
     ) {
         Item item = itemService.getItem(item_id);
-        if (item!=null) {
+        if (item != null) {
             Picture picture = pictureService.getPicture(picture_id);
-            if (picture!=null){
+            if (picture != null) {
                 picture.setItem(null);
                 return "redirect:/admin_items";
             }
@@ -627,7 +635,7 @@ public class HomeController {
             if (password.equals(repassword)) {
                 ArrayList<Role> roles = new ArrayList<>();
                 roles.add(roleService.getSimpleRole());
-                userService.saveUser(new User(null, email, passwordEncoder.encode(password), full_name,null, roles));
+                userService.saveUser(new User(null, email, passwordEncoder.encode(password), full_name, null, roles));
                 model.addAttribute("error", "noerr");
                 return "redirect:/login";
             } else {
@@ -706,6 +714,23 @@ public class HomeController {
         return "redirect:/admin_countries";
     }
 
+    @PostMapping(value = "/addComment")
+    public String addComment(
+            @RequestParam(name = "comment", defaultValue = "Default comment") String comment,
+            @RequestParam(name = "item_id", defaultValue = "0L") Long item_id,
+            @RequestParam(name = "author_id", defaultValue = "0L") Long author_id
+    ) {
+        Date currentDate = new Date(System.currentTimeMillis());
+        Item item = itemService.getItem(item_id);
+        User author = userService.getUserById(author_id);
+        if (item != null) {
+            if (author != null) {
+                commentService.addComment(new Comment(null, comment, currentDate, item, author));
+            }
+        }
+        return "redirect:/details/" + item_id;
+    }
+
     @PostMapping(value = "/addRole")
     public String addRole(
             @RequestParam(name = "role_name", defaultValue = "Default name") String role_name,
@@ -768,19 +793,19 @@ public class HomeController {
         return "redirect:/admin_users";
     }
 
-    @GetMapping(value = "/viewPictureOfItem/{url}",produces = {MediaType.IMAGE_JPEG_VALUE})
-    public @ResponseBody byte[] viewPictureOfItem(
-            @PathVariable(name = "url") String url,HttpSession session)throws IOException {
+    @GetMapping(value = "/viewPictureOfItem/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    public @ResponseBody
+    byte[] viewPictureOfItem(
+            @PathVariable(name = "url") String url, HttpSession session) throws IOException {
         String picture_url = viewPathForItem + defaultPicture;
-        if (url!=null){
-            picture_url = viewPathForItem + url+".jpg";
+        if (url != null) {
+            picture_url = viewPathForItem + url + ".jpg";
         }
         InputStream in;
         try {
             ClassPathResource resource = new ClassPathResource(picture_url);
             in = resource.getInputStream();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             ClassPathResource resource = new ClassPathResource(viewPathForItem + defaultPicture);
             in = resource.getInputStream();
             e.printStackTrace();
@@ -788,20 +813,20 @@ public class HomeController {
         return IOUtils.toByteArray(in);
     }
 
-    @GetMapping(value = "/viewPhoto/{url}",produces = {MediaType.IMAGE_JPEG_VALUE})
+    @GetMapping(value = "/viewPhoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
     @PreAuthorize("isAuthenticated()")
-    public @ResponseBody byte[] viewProfilePhoto(
-            @PathVariable(name = "url") String url)throws IOException {
+    public @ResponseBody
+    byte[] viewProfilePhoto(
+            @PathVariable(name = "url") String url) throws IOException {
         String picture_url = viewPath + defaultPicture;
-        if (url!=null){
-            picture_url = viewPath + url+".jpg";
+        if (url != null) {
+            picture_url = viewPath + url + ".jpg";
         }
         InputStream in;
         try {
             ClassPathResource resource = new ClassPathResource(picture_url);
             in = resource.getInputStream();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             ClassPathResource resource = new ClassPathResource(viewPath + defaultPicture);
             in = resource.getInputStream();
             e.printStackTrace();
@@ -812,13 +837,13 @@ public class HomeController {
     @PostMapping(value = "/uploadAvatar")
     @PreAuthorize("isAuthenticated()")
     public String uploadAvatar(Model model,
-                           @RequestParam(name = "user_ava") MultipartFile file
+                               @RequestParam(name = "user_ava") MultipartFile file
     ) {
         if (file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png")) {
             try {
                 User currentUser = getUserData();
                 assert currentUser != null;
-                String picName = DigestUtils.sha1Hex("avatar_"+currentUser.getId()+"_!Picture");
+                String picName = DigestUtils.sha1Hex("avatar_" + currentUser.getId() + "_!Picture");
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(uploadPath + picName + ".jpg");
                 Files.write(path, bytes);
@@ -862,7 +887,7 @@ public class HomeController {
     ) {
         User user = userService.getUserById(id);
 
-        boolean result = passwordEncoder.matches(old_password,user.getPassword());
+        boolean result = passwordEncoder.matches(old_password, user.getPassword());
         if (user != null) {
             if (result) {
                 if (new_password.equals(new_repassword)) {
@@ -876,11 +901,10 @@ public class HomeController {
                     newUser.setPicture_url(user.getPicture_url());
                     newUser.setPassword(encryptedNewPassword);
                     userService.saveUser(newUser);
-                }
-                else {
+                } else {
                     model.addAttribute("error", "Incorrect re password");
                 }
-            }else {
+            } else {
                 model.addAttribute("error", "Incorrect old password");
             }
         }
@@ -900,6 +924,21 @@ public class HomeController {
             roleService.saveRole(role);
         }
         return "redirect:/admin_roles";
+    }
+
+    @PostMapping(value = "/editComment")
+    public String editComment(@RequestParam(name = "item_id") Long item_id,
+                           @RequestParam(name = "comment_id") Long comment_id,
+                           @RequestParam(name = "comment") String comment
+    ) {
+        System.out.println("QWE");
+        Comment comment1 = commentService.getComment(comment_id);
+        if (comment1!=null){
+            System.out.println("ABC");
+            comment1.setComment(comment);
+            commentService.saveComment(comment1);
+        }
+        return "redirect:/details/" + item_id;
     }
 
     @PostMapping(value = "/editCategory")
@@ -925,6 +964,19 @@ public class HomeController {
     public String deleteItem(@RequestParam(name = "id") Long id) {
         itemService.deleteItemById(id);
         return "redirect:/admin_items";
+    }
+
+    @PostMapping(value = "/deleteComment")
+    public String deleteComment(@RequestParam(name = "comment_id") Long id,
+                                @RequestParam(name = "item_id") Long item_id) {
+        commentService.deleteCommentById(id);
+        return "redirect:/details/" + item_id;
+    }
+
+    @PostMapping(value = "/adminDeleteComment")
+    public String adminDeleteComment(@RequestParam(name = "comment_id") Long id) {
+        commentService.deleteCommentById(id);
+        return "redirect:/admin_comments";
     }
 
     @PostMapping(value = "/deleteCategory")
@@ -966,11 +1018,24 @@ public class HomeController {
         model.addAttribute("currentUser", getUserData());
         return "403";
     }
+//
+//    public String admin_role_details(Model model, @PathVariable(name = "idshka") Long id) {
+//        Role role = roleService.getRoleById(id);
+//        model.addAttribute("role", role);
+//        model.addAttribute("currentUser", getUserData());
+//        return "admin_role_details";
+//    }
+
 
     @GetMapping(value = "/login")
-    public String login(Model model) {
+    public String login(Model model, @RequestParam(name = "error", defaultValue = "noerr") String error) {
+
         model.addAttribute("currentUser", getUserData());
-        model.addAttribute("error", "noerr");
+        if (error.equals("yes")) {
+            model.addAttribute("error", "ERROR ERROR");
+        } else {
+            model.addAttribute("error", error);
+        }
         return "login";
     }
 

@@ -1,0 +1,45 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+<div layout:fragment="site_content">
+    <div class="col-9">
+        <form>
+            <h2 th:text="#{menu.allItems}" style="float: left"></h2>
+            <button type="button" class="btn btn-dark" style="float: right" data-toggle="modal"
+                    data-target="#addCommentModal">ADD NEW
+            </button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Added date</th>
+                <th scope="col">Item</th>
+                <th scope="col">Author</th>
+                <th scope="col">Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="comment:${comments}">
+                <th scope="row" th:text="${comment.getId()}"></th>
+                <td th:text="${comment.getComment()}"></td>
+                <td th:text="${comment.getAddedDate()}"></td>
+                <td th:text="${comment.getItem().getName()}"></td>
+                <td th:text="${comment.getAuthor().getFull_name()}"></td>
+                <td>
+                <form th:action="${'/adminDeleteComment'}" method="post">
+                    <input type="hidden" name="comment_id" th:value="${comment.getId()}">
+                    <button class="btn btn-danger" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                        </svg></button>
+                </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+</html>

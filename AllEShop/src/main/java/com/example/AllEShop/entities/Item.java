@@ -44,10 +44,10 @@ public class Item {
     @Column(name = "in_top_page")
     private Boolean inTopPage;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne()
     private Brand brand;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany()
     private List<Category> categories;
 
 }
