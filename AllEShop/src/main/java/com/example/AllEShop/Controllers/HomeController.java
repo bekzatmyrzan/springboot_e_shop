@@ -1032,7 +1032,7 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
         if (error.equals("yes")) {
-            model.addAttribute("error", "ERROR ERROR");
+            model.addAttribute("error", "Incorrect email/password");
         } else {
             model.addAttribute("error", error);
         }
